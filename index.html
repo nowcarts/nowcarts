@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TailorMade Tees — Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Small custom styles for the T-shirt preview */
+    .tee-canvas { width: 260px; height: 320px; border-radius: 16px; position: relative; overflow: hidden; box-shadow: 0 6px 18px rgba(15,23,42,0.08); }
+    .tee-front { position: absolute; inset: 0; display:flex;align-items:center;justify-content:center;}
+    .tee-text { font-weight:800; letter-spacing:0.06em; text-align:center; pointer-events:none; }
+    @media (min-width: 1024px){ .layout-grid{ grid-template-columns: 360px 1fr; } }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+  <div class="max-w-7xl mx-auto p-4">
+    <header class="flex items-center justify-between py-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-gradient-to-r from-indigo-600 to-pink-500 text-white font-extrabold px-3 py-2 rounded-2xl">TM</div>
+        <div>
+          <h1 class="text-xl font-extrabold">TailorMade Tees</h1>
+          <p class="text-sm text-gray-500">Custom T-shirts — Responsive demo</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:block bg-white border rounded px-3 py-2 shadow">
+          <input id="search" placeholder="Search tees..." class="outline-none w-48 text-sm" />
+        </div>
+        <button id="cartBtn" class="bg-white border rounded px-3 py-2 shadow relative">
+          Cart <span id="cartCount" class="ml-2 bg-indigo-600 text-white rounded-full px-2 py-0.5 text-xs">0</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="mt-6 grid gap-6 lg:grid-cols-2 layout-grid">
+      <!-- Left: Product list + filters -->
+      <aside class="space-y-4">
+        <div class="bg-white p-4 rounded-xl shadow">
+          <div class="flex items-center justify-between">
+            <h2 class="font-semibold">Featured Tees</h2>
+            <div class="text-sm text-gray-500">3 designs</div>
+          </div>
+
+          <div id="products" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+            <!-- JS will inject product cards -->
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow">
+          <h3 class="font-semibold">Filters</h3>
+          <label class="block text-xs text-gray-500 mt-3">Max price: <span id="priceLabel">₹2000</span></label>
+          <input id="priceRange" type="range" min="200" max="2000" step="50" value="2000" class="w-full mt-2">
+
+          <div class="mt-4 flex gap-2">
+            <button id="resetBtn" class="px-3 py-2 rounded bg-indigo-50 text-indigo-700 text-sm">Reset</button>
+            <button id="quickBtn" class="px-3 py-2 rounded bg-green-50 text-green-700 text-sm">Quick Checkout</button>
+          </div>
+        </div>
+
+        <div class="text-sm text-gray-500">Tip: Click a product to customize it. Try mobile view for responsive layout.</div>
+      </aside>
+
+      <!-- Right: Customizer & Cart summary -->
+      <section class="space-y-4">
+        <div class="bg-white p-4 rounded-xl shadow grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div class="flex items-start gap-4">
+            <div id="preview" class="tee-canvas bg-white p-6">
+              <div class="tee-front">
+                <div id="teeInner" style="width:180px;height:220px;border-radius:12px;" class="rounded-lg"></div>
+                <div id="teeText" class="tee-text" style="position:absolute; width:100%;">PREVIEW</div>
+              </div>
+            </div>
+            <div>
+              <h3 id="productTitle" class="font-semibold">Select a product</h3>
+              <div id="productPrice" class="text-indigo-600 font-bold mt-1">₹0</div>
+              <div id="productSizes" class="text-xs text-gray-500 mt-2">Sizes: -</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-xs text-gray-600">Color</label>
+                <div id="colorSwatches" class="mt-2 flex gap-2"></div>
+              </div>
+              <div>
+                <label class="text-xs text-gray-600">Size</label>
+                <select id="sizeSelect" class="w-full mt-2 px-2 py-1 border rounded"></select>
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <label class="text-xs text-gray-600">Custom Text (max 20)</label>
+              <input id="customText" maxlength="20" placeholder="e.g. TEAM AKASH" class="w-full mt-2 px-3 py-2 border rounded" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mt-3">
+              <div>
+                <label class="text-xs text-gray-600">Text color</label>
+                <input id="textColor" type="color" value="#000000" class="w-full mt-2 p-1 rounded" />
+              </div>
+              <div>
+                <label class="text-xs text-gray-600">Text size</label>
+                <input id="textSize" type="range" min="12" max="48" value="24" class="w-full mt-4" />
+              </div>
+            </div>
+
+            <div class="mt-3 flex items-center gap-2">
+              <label class="text-xs text-gray-600">Placement</label>
+              <select id="placement" class="ml-2 px-2 py-1 border rounded">
+                <option value="top">Top</option>
+                <option value="center" selected>Center</option>
+                <option value="bottom">Bottom</option>
+              </select>
+            </div>
+
+            <div class="mt-4 flex gap-2 items-center">
+              <label class="text-xs text-gray-600">Qty</label>
+              <input id="qty" type="number" min="1" value="1" class="w-20 ml-2 px-2 py-1 border rounded" />
+            </div>
+
+            <div class="mt-4 flex gap-2">
+              <button id="addBtn" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg">Add to cart</button>
+              <button id="buyBtn" class="flex-1 border rounded-lg py-2">Buy now</button>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow">
+          <h3 class="font-semibold">Cart Summary</h3>
+          <div id="cartList" class="mt-3 space-y-3 text-sm">
+            <div class="text-gray-500">Cart is empty</div>
+          </div>
+          <div class="mt-4 flex items-center justify-between border-t pt-3">
+            <div class="font-semibold">Total</div>
+            <div id="totalPrice" class="font-bold">₹0</div>
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button id="checkout" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg">Checkout</button>
+            <button id="clearCart" class="flex-1 border rounded-lg py-2">Clear</button>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <footer class="mt-8 text-center text-sm text-gray-500">© <span id="year"></span> TailorMade Tees — Static demo (Save as <code>index.html</code> and open in browser)</footer>
+  </div>
+
+  <script>
+    // Data
+    const PRODUCTS = [
+      { id:'classic-polo', name:'Classic Polo', price:799, colors:['white','black','navy','olive'], sizes:['S','M','L','XL','XXL'] },
+      { id:'vintage-crew', name:'Vintage Crew', price:899, colors:['ash','maroon','teal','charcoal'], sizes:['S','M','L','XL'] },
+      { id:'graphic-pro', name:'Graphic Pro', price:1099, colors:['white','black','heather'], sizes:['M','L','XL'] },
+    ];
+
+    // Utilities
+    function colorMap(k){ const map = { white:'#ffffff', black:'#111827', navy:'#0F172A', olive:'#4B5320', ash:'#E5E7EB', maroon:'#7F1D1D', teal:'#0D9488', charcoal:'#374151', heather:'#E6E7E9' }; return map[k]||k }
+
+    // State
+    let state = { selected: null, customization: { color:'white', size:'M', text:'', textColor:'#000000', textSize:24, placement:'center', qty:1 }, cart: [] };
+
+    // DOM refs
+    const productsEl = document.getElementById('products');
+    const productTitle = document.getElementById('productTitle');
+    const productPrice = document.getElementById('productPrice');
+    const productSizes = document.getElementById('productSizes');
+    const colorSwatches = document.getElementById('colorSwatches');
+    const sizeSelect = document.getElementById('sizeSelect');
+    const customText = document.getElementById('customText');
+    const textColor = document.getElementById('textColor');
+    const textSize = document.getElementById('textSize');
+    const placement = document.getElementById('placement');
+    const qty = document.getElementById('qty');
+    const addBtn = document.getElementById('addBtn');
+    const cartList = document.getElementById('cartList');
+    const totalPrice = document.getElementById('totalPrice');
+    const cartCount = document.getElementById('cartCount');
+    const teeInner = document.getElementById('teeInner');
+    const teeText = document.getElementById('teeText');
+    const productPriceLabel = document.getElementById('productPrice');
+    const priceRange = document.getElementById('priceRange');
+    const priceLabel = document.getElementById('priceLabel');
+
+    // Init
+    document.getElementById('year').innerText = new Date().getFullYear();
+    function renderProducts(filterMax=2000){ productsEl.innerHTML='';
+      PRODUCTS.filter(p=>p.price<=filterMax).forEach(p=>{
+        const card = document.createElement('button'); card.className='bg-white rounded-xl p-3 shadow flex flex-col items-center text-left';
+        card.innerHTML = `<div class="w-24 h-24 flex items-center justify-center rounded-lg border"><svg width="60" height="60" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="68" height="68" rx="12" fill="#F3F4F6"/><path d="M17 24c6-6 34-6 40 0v22c-6 6-34 6-40 0V24z" fill="#E5E7EB"/></svg></div><div class="mt-3 text-sm font-semibold">${p.name}</div><div class="mt-1 text-xs text-gray-500">₹${p.price}</div>`;
+        card.onclick = ()=> selectProduct(p);
+        productsEl.appendChild(card);
+      }) }
+
+    function selectProduct(p){ state.selected = p; state.customization.color = p.colors[0]; state.customization.size = p.sizes[0]; state.customization.qty = 1; updateCustomizer(); }
+
+    function updateCustomizer(){ const p = state.selected; if(!p){ productTitle.innerText='Select a product'; productPrice.innerText='₹0'; productSizes.innerText='Sizes: -'; colorSwatches.innerHTML=''; sizeSelect.innerHTML=''; teeInner.style.background='#ffffff'; teeText.innerText='PREVIEW'; return }
+      productTitle.innerText = p.name; productPrice.innerText = '₹'+p.price; productSizes.innerText = 'Sizes: '+p.sizes.join(' • ');
+      // colors
+      colorSwatches.innerHTML=''; p.colors.forEach(c=>{
+        const btn = document.createElement('button'); btn.className='w-8 h-8 rounded-full ring-2'; btn.style.border='none'; btn.title=c; btn.onclick = ()=>{ state.customization.color=c; refreshPreview() };
+        btn.style.boxShadow = (state.customization.color===c)?'0 0 0 3px rgba(99,102,241,0.15)':'';
+        const dot = document.createElement('div'); dot.className='w-full h-full rounded-full'; dot.style.background = colorMap(c);
+        btn.appendChild(dot); colorSwatches.appendChild(btn);
+      });
+      // sizes
+      sizeSelect.innerHTML=''; p.sizes.forEach(s=>{ const opt = document.createElement('option'); opt.value=s; opt.text=s; sizeSelect.appendChild(opt) });
+      // set inputs
+      customText.value = state.customization.text;
+      textColor.value = state.customization.textColor;
+      textSize.value = state.customization.textSize;
+      placement.value = state.customization.placement;
+      qty.value = state.customization.qty;
+      refreshPreview();
+    }
+
+    function refreshPreview(){ const c = state.customization; const p = state.selected;
+      teeInner.style.background = colorMap(c.color);
+      teeText.style.color = c.textColor; teeText.style.fontSize = c.textSize+'px';
+      teeText.innerText = c.text || p?.name || 'PREVIEW';
+      // placement
+      if(c.placement==='top'){ teeText.style.top='28%'; } else if(c.placement==='bottom'){ teeText.style.top='65%'; } else { teeText.style.top='45%'; }
+    }
+
+    // Cart logic
+    function addToCart(){ if(!state.selected){ alert('Select a product first'); return }
+      const key = `${state.selected.id}-${state.customization.color}-${state.customization.size}-${state.customization.text}`;
+      const existing = state.cart.find(x=>x.key===key);
+      const item = { key, productId: state.selected.id, name: state.selected.name, price: state.selected.price, qty: Number(qty.value), color: state.customization.color, size: sizeSelect.value, text: customText.value, textColor: textColor.value, textSize: Number(textSize.value), placement: placement.value };
+      if(existing){ existing.qty += item.qty; } else { state.cart.push(item) }
+      // sync customization
+      state.customization.text = customText.value; state.customization.textColor = textColor.value; state.customization.textSize = Number(textSize.value); state.customization.placement = placement.value; state.customization.qty = Number(qty.value); state.customization.size = sizeSelect.value;
+      renderCart();
+    }
+
+    function renderCart(){ cartList.innerHTML=''; if(state.cart.length===0){ cartList.innerHTML='<div class="text-gray-500">Cart is empty</div>'; totalPrice.innerText='₹0'; cartCount.innerText='0'; return }
+      let total=0; state.cart.forEach(it=>{ total += it.price*it.qty; const row = document.createElement('div'); row.className='flex items-center justify-between'; row.innerHTML = `<div class="flex items-center gap-3"><div class="w-12 h-12 rounded bg-gray-100 flex items-center justify-center text-xs">${it.name}</div><div><div class="font-medium">${it.name}</div><div class="text-xs text-gray-500">${it.size} • ${it.color} • ${it.text?`"${it.text}"`:'No Text'}</div></div></div><div class="flex items-center gap-2"><button class="px-2 py-1 rounded bg-gray-100">-</button><div>${it.qty}</div><button class="px-2 py-1 rounded bg-gray-100">+</button><div class="ml-3 font-semibold">₹${it.price*it.qty}</div><button class="ml-2 text-xs text-red-500">Remove</button></div>`;
+        // attach qty handlers
+        const minus = row.querySelector('button'); minus.onclick = ()=>{ it.qty = Math.max(1, it.qty-1); renderCart(); };
+        const plus = row.querySelectorAll('button')[1]; plus.onclick = ()=>{ it.qty = it.qty+1; renderCart(); };
+        const remove = row.querySelectorAll('button')[2]; remove.onclick = ()=>{ state.cart = state.cart.filter(x=>x.key!==it.key); renderCart(); };
+        cartList.appendChild(row);
+      }); totalPrice.innerText = '₹'+total; cartCount.innerText = state.cart.length;
+    }
+
+    // Bind events
+    addBtn.onclick = addToCart;
+    document.getElementById('clearCart').onclick = ()=>{ state.cart = []; renderCart(); }
+    document.getElementById('checkout').onclick = ()=>{ if(state.cart.length===0){ alert('Cart empty') } else { alert('Demo checkout — replace with real payment integration') } };
+    productPriceLabel.innerText = '₹2000'; priceRange.oninput = ()=>{ priceLabel.innerText = '₹'+priceRange.value; renderProducts(Number(priceRange.value)) };
+    document.getElementById('resetBtn').onclick = ()=>{ priceRange.value=2000; priceLabel.innerText='₹2000'; renderProducts(2000) };
+    document.getElementById('quickBtn').onclick = ()=>{ alert('Demo quick checkout — no payment attached') };
+
+    // inputs live-update preview
+    customText.addEventListener('input', ()=>{ state.customization.text = customText.value; refreshPreview() });
+    textColor.addEventListener('input', ()=>{ state.customization.textColor = textColor.value; refreshPreview() });
+    textSize.addEventListener('input', ()=>{ state.customization.textSize = Number(textSize.value); refreshPreview() });
+    placement.addEventListener('change', ()=>{ state.customization.placement = placement.value; refreshPreview() });
+    qty.addEventListener('change', ()=>{ state.customization.qty = Number(qty.value); });
+
+    // init render
+    renderProducts(); updateCustomizer(); renderCart();
+  </script>
+</body>
+</html>
